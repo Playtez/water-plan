@@ -1,6 +1,7 @@
 import React from 'react';
 import DonutComponent from '../components/DonutChart/DonutComponent';
 import { BarChart } from '../components/BarChart/BarChart';
+import { MyD3Component } from './MyD3Component';
 // import LineChart from '../components/LineChart/LineChart';
 
 const App = () => {
@@ -15,9 +16,9 @@ const App = () => {
     setGroupColor(color);
   };
 
-  console.log({ selectedGroup, groupColor });
   return (
     <div>
+      <MyD3Component />
       <svg viewBox='-2 0 100 100' preserveAspectRatio='xMidYMid meet'>
         <DonutComponent x={15} y={20} onChangeGroup={updateBarChart} />
       </svg>

@@ -1,51 +1,84 @@
 import React from 'react';
-import * as d3 from 'd3';
+import {
+  select,
+  line,
+  curveCardinal,
+  axisBottom,
+  scaleLinear,
+  axisRight,
+} from 'd3';
 
-interface IProps {
-  data?: number[];
-}
+interface IProps {}
+
 export const MyD3Component = (props: IProps) => {
-  /* The useRef Hook creates a variable that "holds on" to a value across rendering
-       passes. In this case it will hold our component's SVG DOM element. It's
-       initialized null and React will assign it later (see the return statement) */
+  const [data, setData] = React.useState<Array<any>>([
+    25,
+    30,
+    45,
+    60,
+    20,
+    65,
+    70,
+  ]);
+  const svgRef = React.useRef(null);
 
-  const d3Container = React.useRef(null);
+  React.useEffect(() => {
+    const svg = select(svgRef.current);
 
-  /* The useEffect Hook is for running side effects outside of React,
-       for instance inserting elements into the DOM using D3 */
+    const xScale = scaleLinear()
+      .domain([0, data.length - 1])
+      .range([0, 300]);
 
-  React.useEffect(
-    () => {
-      if (props.data && d3Container.current) {
-        const svg = d3.select(d3Container.current);
-        // Bind D3 data
+    const yScale = scaleLinear().domain([0, 150]).range([150, 0]);
 
-        const update = svg.append('g').selectAll('text').data(props.data);
+    const xAxis = axisBottom(xScale);
 
-        // Enter new D3 elements
+    svg
+      .select('.x-axis-bottom')
+      .style('transform', 'translateY(100%)')
+      // @ts-ignore
+      .call(xAxis);
+
+    const yAxis = axisRight(yScale);
+
+    svg
+      .select('.y-axis-bottom')
+      .style('transform', 'translateX(100%)')
+      //@ts-ignore
+      .call(yAxis);
+
+    const myLine = line()
+      .x((value, index) => xScale(index))
+      //@ts-ignore
+      .y(yScale)
+      .curve(curveCardinal);
+
+    svg
+      .selectAll('.line')
+      .data([data])
+      .join('path')
+      .attr('class', 'line')
+      .attr('class', 'h-full w-full')
+      .attr('d', myLine)
+      .attr('fill', 'none')
+      .attr('stroke', 'blue');
+  }, [data]);
+
+  return (
+    <div>
+      <svg className='overflow-visible h-full' ref={svgRef}>
+        <g className='y-axis-bottom' />
+        <g className='x-axis-bottom' />
+      </svg>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <button onClick={() => setData(data.map((value) => value + 5))}>
         update
-          .enter()
-          .append('text')
-          .attr('x', (d, i) => i * 25)
-          .attr('y', 40)
-          .style('font-size', 24)
-          .text((d: number) => d);
-
-        // Update existing D3 elements
-        update.attr('x', (d, i) => i * 40).text((d: number) => d);
-
-        // Remove old D3 elements
-        update.exit().remove();
-      }
-    },
-    /*
-            useEffect has a dependency array (below). It's a list of dependency
-            variables for this useEffect block. The block will run after mount
-            and whenever any of these variables change. We still have to check
-            if the variables are valid, but we do not have to compare old props
-            to next props to decide whether to rerender.
-        */
-    [props.data]
+      </button>
+      <button>filter</button>
+    </div>
   );
-  return <svg className='w-1/2 h-full mx-auto bg-red-400' ref={d3Container} />;
 };

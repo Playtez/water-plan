@@ -33,7 +33,7 @@ export const BarChart = ({
         y={-34}
         textAnchor='start'
         transform={`scale(1, -1)`}
-        style={barTextStyle}
+        className='text-xs'
       >
         {selectedData[0].group}
       </text>
